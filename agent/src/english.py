@@ -1,5 +1,4 @@
 import json
-
 from typing import Optional, List, cast
 from .pcomb import Either, Left, Right
 from .pcomb import char, letters, ws, sep_by, until
@@ -127,6 +126,9 @@ WWPV = W >> W >> P >> V  # what can you do
 
 
 class SentenceStructure:
+    """
+    sentence structure for english.
+    """
     statement = (PWV
                  | PVA
                  | PVP
@@ -147,6 +149,9 @@ def exthuasted(r: Either):
 
 # check sentence structure.
 def parse_sentence_structure(res: Either):
+    """
+    construct sentence structure tags.
+    """
     if isinstance(res, Left):
         return None
     if isinstance(res, Right):

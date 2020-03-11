@@ -1,4 +1,6 @@
-
+"""
+A Parser combinator resemble haskell parsec.
+"""
 import string
 from abc import ABC, abstractmethod
 from typing import Callable, Any, Generic, TypeVar, cast
@@ -23,6 +25,7 @@ def flatten(l): return [
 
 
 class Functor(ABC, Generic[U]):
+    """ functor typeclass """
     @abstractmethod
     def fmap(self, f: Callable) -> 'Functor[U]':
         ...
@@ -78,7 +81,7 @@ class Right(Either):
         return Right((f(self.val0), self.val[1]))
 
 
-class Parser:
+class Parser(Functor):
     def __init__(self, f):
         self.f = f
         self._discarded = False

@@ -1,3 +1,7 @@
+"""
+All the runtime state the bot will use.
+"""
+
 from abc import ABC, abstractmethod
 from typing import List
 import json
@@ -11,6 +15,9 @@ from .english import SentenceStructure as S
 
 
 class Role:
+    """
+    super class for bot roles to provides role specific static data.
+    """
     rolename = "generic"
 
     greeting = [
@@ -57,6 +64,7 @@ class Friend(Role):
     rolename = "friend"
 
 
+# Used to return the assessment report of user input.
 ChoiceVec = NamedTuple("ChoiceVec", (('role', str), ('tone', str)))
 
 
@@ -144,6 +152,5 @@ class State(ABC):
                 negativity += 1
             if w in self.role.greeting:
                 greeting += 1
-
 
         return State.ReqAnalyseVec(censor / n, negativity / n, greeting / n)

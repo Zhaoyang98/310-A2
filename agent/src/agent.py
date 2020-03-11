@@ -9,6 +9,11 @@ from .state import Friend
 
 
 class Agent:
+    """
+    For creating a new bot entity.
+    Handling the repl conversation.
+    """
+
     role_menu = """
     1. Call agent center
     2. Psychiatrist
@@ -21,6 +26,7 @@ class Agent:
         self.state = State("static/dictoinary.json")
 
     def run(self):
+        """ selection root """
         # entrance of the bot
         while True:
             # print("Hi there. What do you want me to be?")
@@ -62,11 +68,3 @@ class Agent:
 
         elif choice == 4:
             self.state = Friend()
-
-
-
-
-
-
-
-

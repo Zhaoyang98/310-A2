@@ -8,11 +8,3 @@ Request = NewType('Request', str)    # from talker
 class QA(NamedTuple):
     req: Request
     res: Response
-
-
-
-
-
-
-
-
