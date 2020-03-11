@@ -1,0 +1,73 @@
+{
+    "generic": {
+        "greeting": [
+            "Hi there",
+            "Hello",
+            "Nice to meet you"
+        ],
+        "positive": [
+            "That's nice",
+            "It's good",
+            "It's ok",
+            "Things will be alright",
+            "everything gonna be alright"
+        ],
+        "negative": [
+            "what's your problem???",
+            "??????",
+            "you seriously?",
+            "Don't think like that",
+            "Don't say that",
+            "I'll call the police",
+            "Plese be polit",
+            "I'm trying to help you",
+            "Don't you dare"
+        ],
+        "confirmative": [
+            "for sure",
+            "isn't it",
+            "correct",
+            "yes",
+            "aboslutely",
+            "right",
+            "keep going",
+            "I'm listening"
+        ],
+        "confused": [
+            "Sorry I don't get it",
+            "Not sure about that ",
+            "Can you articulate?",
+            "Pardon?",
+            "Emmmm?"
+        ],
+        "statement": [
+            "My passion is cheer my patient up",
+            "I want you to be happy",
+            "Do you?",
+            "That's interesting",
+            "I whish you will",
+            "Say what you are thinking",
+            "I'm here to help",
+            "I can talk with you"
+        ]
+    },
+    "psychiatrist": {
+        "positive": [],
+        "negative": [],
+        "confirmative": [],
+        "confused": [],
+        "statement": [
+            "You’re not alone in this",
+            "There is hope, even when your brain tells you there isn't",
+            "Healing is not linear",
+            "Sometimes life will just kick you around. But sooner or later, you realize you're not just a survior, and you're stronger thant anything life throws your way",
+            "If today all you did was hold youself together, I'm pround of you",
+            "Give yourself another day, another chance. You will find your courage eventually. Don't give up on yourself just yet",
+            "Once you choose hope, anything is possible",
+            "The strength of the past will reflect in the future",
+            "A world of pain and troubles is necessary to school an intelligence and make it a soul.",
+            "Any fool can be happy. It takes a man with real heart to make beauty out of the stuff that makes us weep",
+            "There are moments when I wish I could roll back the clock and take all the sadness away, but I have the feeling that if I did, the joy would be gone as well."
+        ]
+    }
+}
