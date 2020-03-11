@@ -148,8 +148,10 @@ class State(ABC):
         for w in wordlist:
             if w in self.role.censorwords:
                 censor += 1
+
             if w in self.role.negativity:
                 negativity += 1
+
             if w in self.role.greeting:
                 greeting += 1
 

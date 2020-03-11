@@ -184,16 +184,22 @@ def parse_sentence_structure(res: Either):
         for w in wordlist:
             if exthuasted(questionword(w)):
                 tags.append('W')
+
             elif exthuasted(pronoun(w)):
                 tags.append('P')
+
             elif exthuasted(noun(w)):
                 tags.append('N')
+
             elif exthuasted(verb(w)):
                 tags.append('V')
+
             elif exthuasted(adjective(w)):
                 tags.append('A')
+
             elif exthuasted(adverb(w)):
                 tags.append('D')
+
             elif exthuasted(article(w)):
                 tags.append('T')
             else:

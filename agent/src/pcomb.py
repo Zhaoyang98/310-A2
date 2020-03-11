@@ -62,6 +62,7 @@ class Right(Either):
 
     @property
     def val0(self):
+        """ shove into list """
         if isinstance(self.val[0], list):
             return flatten(self.val[0])
         else:
@@ -81,12 +82,12 @@ class Right(Either):
         return Right((f(self.val0), self.val[1]))
 
 
-class Parser(Functor):
-    def __init__(self, f):
+class Parser(Functor[U]):
+    def __init__(self, f: Callable):
         self.f = f
         self._discarded = False
 
-    def parse(self, *args, **kwargs):
+    def parse(self, *args, **kwargs):  # push whatever state.
         return self.f(*args, **kwargs)
 
     def __rshift__(self, rparser):
@@ -98,12 +99,13 @@ class Parser(Functor):
     def __or__(self, rparser):
         return otherwise(self, rparser)
 
-    def fmap(self, transformer):
-        return Parser(
-            lambda *args, **kwargs: self.f(*args, **kwargs).fmap(transformer))
-
     def __mul__(self, times):
         return n(self, times)
+
+    def fmap(self, transformer):
+        return Parser(
+            lambda *args, **kwargs: (
+                self.f(*args, **kwargs).fmap(transformer)))
 
     def discard(self):
         self._discarded = True
@@ -116,7 +118,7 @@ def run_parser(p, inp):
     return p(inp)
 
 
-def valcheck(v):
+def valcheck(v) -> bool:
     if isinstance(v, str) and not v.strip():
         return False
     if isinstance(v, list) and v and v[0] == "":
@@ -124,8 +126,9 @@ def valcheck(v):
     return True
 
 
-def then(p1, p2):
-    def curried(s):
+def then(p1: Parser, p2: Parser) -> Parser:
+    @Parser
+    def parse(s):
         res1 = p1(s)
         if isinstance(res1, Left):
             return res1
@@ -142,11 +145,12 @@ def then(p1, p2):
 
                 return Right((vs, res2.val[1]))
             return res2
-    return Parser(curried)
+    return parse
 
 
-def n(parser, count):
-    def curried(s):
+def n(parser: Parser, count: int) -> Parser:
+    @Parser
+    def parse(s):
         fullparsed = ""
         for i in range(count):
             res = parser(s)
@@ -157,11 +161,12 @@ def n(parser, count):
                 s = remaining
                 fullparsed += parsed
         return Right((fullparsed, s))
-    return Parser(curried)
+    return parse
 
 
-def otherwise(p1, p2):
-    def curried(s):
+def otherwise(p1: Parser, p2: Parser) -> Parser:
+    @Parser
+    def parse(s):
         res = p1(s)
         if isinstance(res, Right):
             return res
@@ -171,11 +176,12 @@ def otherwise(p1, p2):
                 return res
             else:
                 return Left("Failed at both")
-    return Parser(curried)
+    return parse
 
 
-def char(c):
-    def curried(s):
+def char(c: str) -> Parser:
+    @Parser
+    def parse(s):
         if not s:
             msg = "S is empty"
             return Left(msg)
@@ -184,23 +190,24 @@ def char(c):
                 return Right((c, s[1:]))
             else:
                 return Left("Expecting '%s' and found '%s'" % (c, s[0]))
-    return Parser(curried)
+    return parse
 
 
-def anyof(parsers):
+def anyof(parsers: List[Parser]) -> Parser:
     return reduce(otherwise, parsers)
 
 
-def strg(s):
+def strg(s: str):
     return reduce(then, list(map(char, list(s)))).fmap(lambda l: "".join(l))
 
 
-def inchars(chars):
+def inchars(chars: Sequence):
     return anyof(list(map(char, chars)))
 
 
-def until_seq(seq):
-    def curried(s):
+def until_seq(seq: Sequence) -> Parser:
+    @Parser
+    def parse(s):
         if not s:
             msg = "S is empty"
             return Left(msg)
@@ -209,27 +216,28 @@ def until_seq(seq):
                 return Right(("", s))
             else:
                 return Left(f"Expecting {seq} and found {s[:len(seq)]}")
-    return Parser(curried)
+    return parse
 
 
-def until(p):
-    def curried(s):
+def until(p: Parser) -> Parser:
+    @Parser
+    def parse(s):
         res = p(s)
         if isinstance(res, Left):
             return res
         else:
             return Right(("", s))
-    return Parser(curried)
+    return parse
 
 
-def many(parser):
-    def zero_or_more(parser, inp):
-        res = parser(inp)
+def many(p: Parser) -> Parser:
+    def zero_or_more(p, inp) -> Tuple:
+        res = p(inp)
         if isinstance(res, Left):
             return "", inp
         else:
             car, cdr = res.val
-            cdar, cddr = zero_or_more(parser, cdr)
+            cdar, cddr = zero_or_more(p, cdr)
             values = car
             if cdar:
                 if isinstance(car, str):
@@ -239,9 +247,10 @@ def many(parser):
                         [cdar] if isinstance(cdar, str) else cdar)
             return values, cddr
 
-    def curried(s):
-        return Right(zero_or_more(parser, s))
-    return Parser(curried)
+    @Parser
+    def parse(s):
+        return Right(zero_or_more(p, s))
+    return parse
 
 
 def sep_by1(sep, parser):
@@ -253,25 +262,26 @@ def sep_by(sep, parser):
     return (sep_by1(sep, parser) | Parser(lambda x: Right(([], ""))))
 
 
-def many1(parser):
-    def curried(s):
-        res = run_parser(parser, s)
+def many1(p: Parser) -> Parser:
+    @Parser
+    def parse(s):
+        res = run_parser(p, s)
         if isinstance(res, Left):
             return res
         else:
-            return run_parser(many(parser), s)
-    return Parser(curried)
+            return run_parser(many(p), s)
+    return parse
 
 
-def optional(parser):
-    noneparser = Parser(lambda x: Right((None, "")))
-    return otherwise(parser, noneparser)
+def optional(p: Parser):
+    noneparser: Parser = Parser(lambda x: Right((None, "")))
+    return otherwise(p, noneparser)
 
 
 def forward(parsergeneratorfn):
-    def curried(s):
+    def parse(s):
         return parsergeneratorfn()(s)
-    return curried
+    return parse
 
 
 letter = inchars(string.ascii_letters)
@@ -282,14 +292,3 @@ digits = many1(digit)
 whitespace = inchars(string.whitespace)
 ws = whitespace.discard()
 letters = many1(letter)
-word = letters
-
-
-def surrounded(
-    surparser, contentparser): return surparser >> contentparser >> surparser
-
-
-quotedword = surrounded((char('"') | char("'")).discard(), word)
-
-
-def commaseparated_of(p): return sep_by(char(",").discard(), many(p))
