@@ -25,8 +25,14 @@ period = char(".")
 prime = char("'")
 questionmark = char("?")
 linebreak = char("\n")
+__ = many1(ws)
 
-
+clausewords = inwords(
+    ["what",
+     "where",
+     "who",
+     "that"
+     ])
 questionword = inwords(
     ["didn't",
      "don't",
@@ -51,20 +57,19 @@ questionword = inwords(
      "does",
      "did"])
 bewords = inwords(
-    [
-        "weren't",
-        "isn't",
-        "aren't",
-        "wasn't",
-        "is",
-        "are",
-        "am",
-        "am not",
-        "be",
-        "was",
-        "was not",
-        "were",
-    ])
+    ["weren't",
+     "isn't",
+     "aren't",
+     "wasn't",
+     "is",
+     "are",
+     "am",
+     "am not",
+     "be",
+     "was",
+     "was not",
+     "were",
+     ])
 _verb = inwords(readwords("static/verb"))
 _pronoun = inwords(readwords("static/pronoun"))
 _noun = inwords(readwords("static/noun"))
@@ -78,18 +83,26 @@ pronoun = _pronoun
 adjective = _adjective
 adverb = _adverb
 noun = _noun
+verb = _verb
 nounclause = (noun
-              | adjective >> noun
+              | adjective >> __ >> noun
               | pronoun
-              | article >> noun
-              | article >> adjective >> noun
+              | article >> __ >> noun
+              | article >> __ >> adjective >> __ >> noun
               )
-adjectiveclause = adjective | adverb >> adjective
-verb = (_verb
-        | adverb >> _verb)
-
+adjectiveclause = (adjective
+                   | adverb >> __ >> adjective
+                   )
+verbclause = (verb                 # TODO add fuzzy.
+              | adverb >> __ >> verb
+              | verb >> __ >> adverb
+              | verb >> strg("ing")
+              | verb >> strg("ed")
+              )
 # basic elements
-anyword = letters | (prime * 1)
+anyword = (letters >> (prime * 1) >> letters
+           | letters
+           )
 word = (noun
         | questionword
         | bewords
@@ -100,9 +113,20 @@ word = (noun
         | anyword
         )
 words = sep_by(ws, word)
-clause = words >> optional(comma)
+clause = words >> optional(__) >> optional(comma).discard()
+subclause = clausewords >> __ >> clausewords
 
-# TODO make it true parser combinator.
+# word order
+ject = (nounclause
+        | adjectiveclause >> __ >> nounclause
+        | verb >> strg("ing")
+        )                       # TODO fuzzy
+
+sbj = ject
+obj = ject
+vb = verbclause
+wordorder = sbj >> __ >> vb >> __ >> obj
+
 
 # sentence structure
 W = char("W")
