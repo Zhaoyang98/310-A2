@@ -253,9 +253,8 @@ def many(p: Parser) -> Parser:
     return parse
 
 
-def sep_by1(sep, parser):
-    sep_then_parser = sep >> parser
-    return parser >> many(sep_then_parser)
+def sep_by1(sep: Parser, p: Parser) -> Parser:
+    return p >> many(sep >> p)
 
 
 def sep_by(sep, parser):
