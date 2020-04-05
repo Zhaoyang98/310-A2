@@ -3,12 +3,19 @@
         "greeting": [
             "Hi there",
             "Hello",
-            "Nice to meet you"
+            "Nice to meet you",
+            "How are you",
+            "How do  you do",
+            "Hey",
+            "Hi"
         ],
         "positive": [
             "That's nice",
+            "That's good",
             "It's good",
             "It's ok",
+            "It's what it is",
+            "No worry",
             "Things will be alright",
             "everything gonna be alright"
         ],
@@ -27,6 +34,7 @@
             "for sure",
             "isn't it",
             "correct",
+            "yes it is",
             "yes",
             "aboslutely",
             "right",
@@ -51,7 +59,7 @@
             "I can talk with you"
         ]
     },
-    "psychiatrist": {
+    "depressed": {
         "positive": [],
         "negative": [],
         "confirmative": [],
@@ -68,6 +76,31 @@
             "A world of pain and troubles is necessary to school an intelligence and make it a soul.",
             "Any fool can be happy. It takes a man with real heart to make beauty out of the stuff that makes us weep",
             "There are moments when I wish I could roll back the clock and take all the sadness away, but I have the feeling that if I did, the joy would be gone as well."
+        ]
+    },
+
+    "ptsd": {
+        "positive": [],
+        "negative": [],
+        "confirmative": [],
+        "confused": [],
+        "statement": [
+          "I understatnd",
+          "I see you're in pain. It's Ok to fell this way.",
+          "Your symptoms make sens given what you've been through. You'fe not broken, weird or hopeless. You are worthy of love and belonging.",
+          "It isn't happening right now. You're safe",
+          "You are not alone, I'm not going anywhere",
+          "What happended doesn't define you",
+          "You didn't deserve that. Please know I'm here for you",
+          "I believe you and I can support you.",
+          "The worst isn't happeing again, even though it may feel that way",
+          "I'm sorry you feel like you can't keep doing this, but I believe in your strength to keep fighting",
+          "It's ok to fall. I'm here to pick you up. Just take it step by step",
+          "You survived, You're resilient",
+          "We are on your side no matter what",
+          "It's not your fault.",
+          "ptsd is not terrible if you face it",
+          "be brave. Everything will be fine as long as you are well."
         ]
     }
 }

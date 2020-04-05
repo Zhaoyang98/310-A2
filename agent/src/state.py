@@ -5,13 +5,17 @@ All the runtime state the bot will use.
 from abc import ABC, abstractmethod
 from typing import List
 import json
-from typing import NamedTuple
+from typing import NamedTuple, List
 from random import choice, random
 
 from .pcomb import Left, Right
 from ._types import Request, Response, QA
 from .english import clause, parse_sentence_structure
 from .english import SentenceStructure as S
+from .fuzzy import fuzzy_in
+
+# Used to return the assessment report of user input.
+ChoiceVec = NamedTuple("ChoiceVec", (('role', str), ('tone', str)))
 
 
 class Role:
@@ -32,40 +36,48 @@ class Role:
         "not", "can't", "cannot", "couldn't", "could not"
     ]
 
+    keywords: List[str] = []
+
 
 class Psychiatrist(Role):
-    rolename = "psychiatrist"
-
     keywords = [
-        "feel", "know", "upset", "incapable", "enraged", "disappointed",
+        "feel", "know", "enraged",
         "doubtful", "alone", "discouraged", "uncertain", "insulting",
-        "ashamed", "indecisive", "sore", "powerless", "useless",
-        "annoyed", "diminished", "embarrassed", "inferior", "upset",
-        "guilty", "hesitant", "vulnerable", "hateful", "dissatisfied",
-        "shy", "empty", "unpleasant", "miserable", "forced",
+        "ashamed", "indecisive", "sore",
+        "hesitant", "vulnerable", "hateful", "dissatisfied",
+        "empty", "unpleasant", "miserable", "forced",
         "offensive", "detestable", "disillusioned", "bitter",
-        "unbelieving", "despair", "aggressive", "despicable", "skeptical",
-        "frustrated", "resentful", "disgusting", "distrustful",
-        "distressed", "abominable", "misgiving", "provoked", "terrible",
+        "unbelieving", "skeptical",
+        "frustrated", "resentful", "disgusting",
+        "misgiving", "provoked", "terrible",
         "lost", "pathetic", "despair", "unsure", "tragic", "infuriated",
-        "uneasy", "cross", "bad"
+        "uneasy", "cross", "bad", "die", "kill"
     ]
 
 
-class Production(Role):
-    rolename = "callagent"
+class Depressed(Psychiatrist):
+    rolename = "depressed"
+
+    keywords = [
+        "annoyed", "diminished", "embarrassed", "inferior", "upset",
+        "depressed", "depression", "distressed", "disappointed",
+        "disappointment",
+        "upset", "incapable", "despair", "despicable", "distrustful",
+        "powerless", "useless", "shy", "incompetent"
+    ] + Psychiatrist.keywords
 
 
-class Celebrity(Role):
-    rolename = "celebrity"
+class PTSD(Role):
+    rolename = "ptsd"
 
-
-class Friend(Role):
-    rolename = "friend"
-
-
-# Used to return the assessment report of user input.
-ChoiceVec = NamedTuple("ChoiceVec", (('role', str), ('tone', str)))
+    keywords = [
+        "past", "memory", "tramumataize", "suffer", "envision", "remember",
+        "panic", "forget", "trigger", "lost", "disoriented", "disorder",
+        "nightmare", "anxiety", "lost of interest", "distress",
+        "distressing", "overprotective", "post", "traumatic", "trauma",
+        "aggressive", "aggressive", "guilty", "abominable",
+        "disgusting", "distrustful", "PTSD", "away", "ptsd"
+    ] + Psychiatrist.keywords
 
 
 class State(ABC):
@@ -81,6 +93,7 @@ class State(ABC):
     def __init__(self, dictname: str):
         self.history: List[QA] = []
         self.role: Role = Role()
+        self.role_switcher = State.RoleSwitcher([Depressed(), PTSD()])
         with open(dictname, 'r') as f:
             self.dict = json.loads(f.read())
 
@@ -110,12 +123,13 @@ class State(ABC):
 
         if S.statement(tag):
 
-            if random() > 0.75:
+            if random() > 0.60:
                 res = self.choice(ChoiceVec("generic", "statement"))
-            elif random() > 0.5:
+            elif random() > 0.55:
                 res = self.choice(ChoiceVec("generic", "confirmative"))
-            else:
-                res = self.choice(ChoiceVec("psychiatrist", "statement"))
+            else:  # determine role
+                self.role_switcher.switch_role_by_stmt(self, req)
+                res = self.choice(ChoiceVec(self.role.rolename, "statement"))
 
         elif S.question(tag):
             if random() > 0.5:
@@ -156,3 +170,30 @@ class State(ABC):
                 greeting += 1
 
         return State.ReqAnalyseVec(censor / n, negativity / n, greeting / n)
+
+    class RoleSwitcher:
+        def __init__(self, roles: List[Role]):
+            self.roles = roles
+
+        def switch_role_by_stmt(self, state: 'State', stmt: str):
+            state.switch_role(self.best_fit(stmt))
+
+        def best_fit(self, statement: str) -> Role:
+            indexes = [
+                (self.keyword_idx(statement, role), role)
+                for role in self.roles
+            ]
+            index, role = max(indexes, key=lambda p: p[0])
+            return role
+
+        def keyword_idx(self, statement: str, role: Role) -> float:
+            """
+            the percentage of words in keyword list
+            Fuzzied with levenshtien.
+            """
+            stmt_words = statement.strip().split(" ")
+            hitted_words = [
+                w for w in stmt_words
+                if fuzzy_in(w, role.keywords)
+            ]
+            return len(hitted_words) / len(stmt_words)

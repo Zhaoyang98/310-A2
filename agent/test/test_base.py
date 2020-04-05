@@ -5,7 +5,6 @@ from src.pcomb import anyof, until_seq, until, sep_by, sep_by1
 from src.pcomb import many, many1, optional
 from src.pcomb import digits, ws
 
-
 class TestParsers(unittest.TestCase):
 
     def test_parser_init(self):
