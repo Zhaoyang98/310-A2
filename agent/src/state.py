@@ -13,6 +13,8 @@ from ._types import Request, Response, QA
 from .english import clause, parse_sentence_structure
 from .english import SentenceStructure as S
 from .fuzzy import fuzzy_in
+from nltk.corpus import wordnet
+
 
 # Used to return the assessment report of user input.
 ChoiceVec = NamedTuple("ChoiceVec", (('role', str), ('tone', str)))
