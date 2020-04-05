@@ -3,7 +3,7 @@ All the runtime state the bot will use.
 """
 
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Set
 import json
 from typing import NamedTuple, List
 from random import choice, random
@@ -13,7 +13,7 @@ from ._types import Request, Response, QA
 from .english import clause, parse_sentence_structure
 from .english import SentenceStructure as S
 from .fuzzy import fuzzy_in
-from nltk.corpus import wordnet
+from .synonyms import enlarge_keywords
 
 
 # Used to return the assessment report of user input.
@@ -31,55 +31,52 @@ class Role:
     ]
 
     censorwords = [
-        "fuck", "shit", "dumb", "ass", "stupid", "retard", "hate",
+        "fuck", "shit", "dumb", "ass", "stupid", "retard",
     ]
 
     negativity = [
         "not", "can't", "cannot", "couldn't", "could not"
     ]
 
-    keywords: List[str] = []
+    keywords: Set[str] = set()
 
 
 class Psychiatrist(Role):
-    keywords = [
-        "feel", "know", "enraged",
-        "doubtful", "alone", "discouraged", "uncertain", "insulting",
+    keywords = enlarge_keywords({
+        "feel", "know",
+        "doubtful", "lonely", "discouraged", "uncertain", "insulting",
         "ashamed", "indecisive", "sore",
         "hesitant", "vulnerable", "hateful", "dissatisfied",
-        "empty", "unpleasant", "miserable", "forced",
-        "offensive", "detestable", "disillusioned", "bitter",
-        "unbelieving", "skeptical",
+        "empty", "unpleasant", "miserable", "detestable", "disillusioned",
         "frustrated", "resentful", "disgusting",
-        "misgiving", "provoked", "terrible",
-        "lost", "pathetic", "despair", "unsure", "tragic", "infuriated",
-        "uneasy", "cross", "bad", "die", "kill"
-    ]
+        "misgiving", "terrible", "lost", "pathetic", "unsure", "tragic",
+        "uneasy", "bad", "die", "kill"
+    })
 
 
 class Depressed(Psychiatrist):
     rolename = "depressed"
 
-    keywords = [
+    keywords = enlarge_keywords({
         "annoyed", "diminished", "embarrassed", "inferior", "upset",
         "depressed", "depression", "distressed", "disappointed",
-        "disappointment",
-        "upset", "incapable", "despair", "despicable", "distrustful",
+        "disappointment", "upset", "incapable", "despair",
+        "despicable", "distrustful",
         "powerless", "useless", "shy", "incompetent"
-    ] + Psychiatrist.keywords
+    }).union(Psychiatrist.keywords)
 
 
 class PTSD(Role):
     rolename = "ptsd"
 
-    keywords = [
+    keywords = enlarge_keywords({
         "past", "memory", "tramumataize", "suffer", "envision", "remember",
         "panic", "forget", "trigger", "lost", "disoriented", "disorder",
-        "nightmare", "anxiety", "lost of interest", "distress",
-        "distressing", "overprotective", "post", "traumatic", "trauma",
-        "aggressive", "aggressive", "guilty", "abominable",
-        "disgusting", "distrustful", "PTSD", "away", "ptsd"
-    ] + Psychiatrist.keywords
+                "nightmare", "anxiety", "lost of interest", "distress",
+                "distressing", "overprotective", "post", "traumatic", "trauma",
+                "aggressive", "aggressive", "guilty", "abominable",
+                "disgusting", "distrustful", "PTSD", "away", "ptsd"
+    }).union(Psychiatrist.keywords)
 
 
 class State(ABC):

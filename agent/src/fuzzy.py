@@ -1,12 +1,12 @@
 """ fuzzy matching """
 
-from typing import Optional, List
+from typing import Optional, List, Set
 import numpy as np
 
 LEVENSHTIEN_TRESTHOLD = 2.0
 
 
-def fuzzy_in(src: str, targets: List[str]) -> bool:
+def fuzzy_in(src: str, targets: Set[str]) -> bool:
     res = [fuzzy(src, target) for target in targets]
     return any(res)
 
