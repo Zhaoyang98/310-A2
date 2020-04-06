@@ -7,12 +7,12 @@ const API = 'https://cosc310-bot.herokuapp.com';
 const INTRO = "Hello I'm Psych Agent Bot and I'm here to listen to you";
 
 const Conversation = () => {
-  const [hist, setHist] = useState<string[]>([INTRO]);
+  const [hist, setHist] = useState<string[]>([]);
   const [message, setMessage] = useState<string | null | undefined>('');
   let messageRef: HTMLInputElement | null;
 
   const buildBubbles = () => {
-    return hist.map((value, i) => (
+    return [INTRO, ...hist].map((value, i) => (
       <Bubble key={i} message={value} sentByUser={i % 2 !== 0} />
     ));
   };
@@ -20,7 +20,7 @@ const Conversation = () => {
   const pushToServer = (message: string) => {
     const url = `${API}/agent/${message}`;
     axios.post(url, hist).then((res) => {
-      setHist([INTRO, ...res.data]);
+      setHist(res.data);
       scroll();
     });
   };
@@ -36,7 +36,6 @@ const Conversation = () => {
     if (message) {
       setHist([...hist, message]);
       pushToServer(message);
-      setMessage(null);
       scroll();
       setMessage('');
     }
