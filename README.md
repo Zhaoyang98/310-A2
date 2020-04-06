@@ -160,3 +160,9 @@ bot> Give yourself another day, another chance. You will find your courage event
 bot> Nice to meet you
 >
 ```
+## Extratable API
+- fuzzy matching: Fuzzy matching based on leveinshtein distance algorithm.
+- synonyms expanding: module for enlargeing word set with its synonyms.
+- parser combinator: A parser combinator.
+- english parser : An module that parsing english into AST.
+- reusbale bot: bot is a module and can be used as an API directly.
