@@ -20,7 +20,7 @@ DICTIONARY_PATH = 'static/dictoinary.json'
 def start_conversation(message):
     state = State(DICTIONARY_PATH)
     state.eat(message.lower())
-    return json.dumps(flatten_pairs(state.history))
+    return json.dumps(state.history)
 
 
 @app.route('/agent/<message>', methods=['POST'])
@@ -30,10 +30,10 @@ def continue_conversation(message):
     state = State(DICTIONARY_PATH)
 
     if history:
-        state.history = create_pairs(history)
+        state.history = history
 
     state.eat(message.lower())
-    return json.dumps(flatten_pairs(state.history))
+    return json.dumps(state.history)
 
 
 def create_pairs(flat_history: List[str]) -> List[Tuple[str, str]]:
