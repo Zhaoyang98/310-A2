@@ -1,0 +1,21 @@
+.bubble-container {
+  display: flex;
+  padding: 10px;
+}
+
+.bubble-container>.bubble {
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  border: 1px solid #efefef;
+  text-align: left;
+}
+
+.bubble-container.user {
+  flex-direction: row-reverse;
+}
+
+.bubble-container.user>.bubble {
+  color: white;
+  background-color: #5350ef;
+}
