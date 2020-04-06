@@ -9,7 +9,7 @@ An interactive psychiatrist chat agent implemented in python. The agent utilizes
 - Understanding mood
 - Providing help to user
 
-## Usage 
+## Usage
 
 The bot can be used online at [http://cosc310agent.surge.sh/](http://cosc310agent.surge.sh/) (GUI)
 
@@ -88,7 +88,7 @@ Base URL: [https://cosc310-bot.herokuapp.com/](https://cosc310-bot.herokuapp.com
 The post body should contain the current state of the bot, that is the current conversation. Example data:
 
 ```json
-['Hello', 'How are you', 'Not bad', 'Good to hear it!']
+["Hello", "How are you", "Not bad", "Good to hear it!"]
 ```
 
 ## Modules
@@ -106,3 +106,57 @@ The post body should contain the current state of the bot, that is the current c
 - Spell checking:  We use the leveinshtein distance algorithm to perform fuzzy lookup to fix common spelling mistakes.
 - Natural language recognition: We use the `nltk` natural language processing toolkit to provide synonyms to improve the conversation variety.
 - 2 topics: Depression and PTSD: The bot can recognize two topics and switch between them during the conversation.
+- Response to aggressive questions.
+
+```
+<-Psychiatrist specialized on depression and PTSD->
+<-Shift topic as you go->
+<-press q to exit program->
+enter q to exit talk
+I'm a bot psychiatrist. How are you?
+> helo
+bot> How do  you do
+> I am not good
+bot> Once you choose hope, anything is possible
+> ok good words there
+bot> Give yourself another day, another chance. You will find your courage eventually. Don't give up on yourself just yet
+> thanks. But I am just too lonely
+bot> Say what you are thinking
+> I feel I am useless
+bot> There are moments when I wish I could roll back the clock and take all the sadness away, but I have the feeling that if I did, the joy would be gone as well.
+> that help a lot.
+bot> right
+> I got this depression thing
+bot> I want you to be happy
+> and I have ptsd too.
+bot> Any fool can be happy. It takes a man with real heart to make beauty out of the stuff that makes us weep
+> yeah. But I cannot forget the past.
+bot> Say what you are thinking
+> I just cann't forget the war I been to
+bot> Sometimes life will just kick you around. But sooner or later, you realize you're not just a survior, and you're stronger thant anything life throws your way
+> How do you cure ptsd?
+bot> Give yourself another day, another chance. You will find your courage eventually. Don't give up on yourself just yet
+> thanks fair
+bot> right
+> I am so aggressive after the war.
+bot> Your symptoms make sens given what you've been through. You'fe not broken, weird or hopeless. You are worthy of love and belonging.
+> but isn't is some kind of disorder?
+bot> Healing is not linear
+> sure.
+bot> Hey
+> Haskell is good
+bot> I'm here to help
+> you are stupid bot
+bot> Plese be polit
+> so stupid hahaha
+bot> Plese be polit
+> stupid
+bot> Give yourself another day, another chance. You will find your courage eventually. Don't give up on yourself just yet
+> stupid
+bot> Don't say that
+> sorry
+bot> Give yourself another day, another chance. You will find your courage eventually. Don't give up on yourself just yet
+> sup
+bot> Nice to meet you
+>
+```

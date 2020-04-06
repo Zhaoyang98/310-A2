@@ -7,6 +7,7 @@ from typing import List, Set
 import json
 from typing import NamedTuple, List
 from random import choice, random
+import os
 
 from .pcomb import Left, Right
 from ._types import Request, Response, QA
@@ -27,12 +28,12 @@ class Role:
     rolename = "generic"
 
     greeting = {
-        "hi", "hello", "how", "are", "you", "sup", "what's up"
+        "hi", "hello", "how", "are", "sup", "what's up"
     }
 
     censorwords = {
         "fuck", "shit", "dumb", "ass", "stupid", "retard",
-        }
+    }
 
     negativity = {
         "not", "can't", "cannot", "couldn't", "could not"
@@ -107,8 +108,16 @@ class State(ABC):
     def eval(self, req: Request) -> Response:
         res: str = ""
         parsed = clause(req)
-        wordlist = set(parsed.val[0]) if isinstance(parsed, Right) else None
+        wordlist = list(
+            filter(
+                lambda n: n is not None,
+                (parsed.val[0]
+                    if isinstance(parsed, Right)
+                    else None)))
+        if os.environ["DEBUG"] == "1":
+            print(wordlist)
         tag = parse_sentence_structure(parsed)
+        censor, negativity, greeting = State.ReqAnalyseVec(0, 0, 0)
 
         # precheck
         if wordlist:
@@ -117,14 +126,14 @@ class State(ABC):
         if censor > 0.05:
             return Response(self.choice(ChoiceVec("generic", "negative")))
 
-        if greeting > 0.7:
+        if greeting > 0.65:
             return Response(self.choice(ChoiceVec("generic", "greeting")))
 
         if S.statement(tag):
 
-            if random() > 0.60:
+            if random() > 0.75:
                 res = self.choice(ChoiceVec("generic", "statement"))
-            elif random() > 0.55:
+            elif random() > 0.65:
                 res = self.choice(ChoiceVec("generic", "confirmative"))
             else:  # determine role
                 self.role_switcher.switch_role_by_stmt(self, req)
@@ -153,12 +162,11 @@ class State(ABC):
             return choice(replies)
         return Response("...")
 
-    def assess(self, wordlist: Set[str]) -> 'State.ReqAnalyseVec':
+    def assess(self, wordlist: List[str]) -> 'State.ReqAnalyseVec':
         negativity = 0
         censor = 0
-        greeting = 1
-        n = len(wordlist) - 1 if len(wordlist) > 1 else 1
-        print(wordlist)
+        greeting = 0
+        n = len(wordlist) if len(wordlist) > 1 else 1
         for w in wordlist:
             if w in self.role.censorwords:
                 censor += 1
@@ -167,7 +175,12 @@ class State(ABC):
                 negativity += 1
 
             if fuzzy_in(w, self.role.greeting):
-                greeting += 2
+                greeting += 1
+        if os.environ["DEBUG"] == "1":
+            print("asess: ", wordlist)
+            print("asess: ",
+                  State.ReqAnalyseVec(censor / n,
+                                      negativity / n, greeting / n))
 
         return State.ReqAnalyseVec(censor / n, negativity / n, greeting / n)
 
@@ -184,6 +197,8 @@ class State(ABC):
                 for role in self.roles
             ]
             index, role = max(indexes, key=lambda p: p[0])
+            if os.environ["DEBUG"] == "1":
+                print(role)
             return role
 
         def keyword_idx(self, statement: str, role: Role) -> float:

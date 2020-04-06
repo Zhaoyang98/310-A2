@@ -3,8 +3,6 @@
 from typing import Optional, List, Set
 import numpy as np
 
-LEVENSHTIEN_TRESTHOLD = 2.0
-
 
 def fuzzy_in(src: Optional[str], targets: Set[str]) -> bool:
     if src is None:
@@ -14,7 +12,10 @@ def fuzzy_in(src: Optional[str], targets: Set[str]) -> bool:
 
 
 def fuzzy(src: str, target: str) -> Optional[str]:
-    if levenshtien(src, target) <= LEVENSHTIEN_TRESTHOLD:
+    threshold = 2
+    if len(src) < 4:
+        threshold = 0
+    if levenshtien(src, target) <= threshold:
         return target
     return None
 
