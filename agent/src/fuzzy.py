@@ -6,7 +6,9 @@ import numpy as np
 LEVENSHTIEN_TRESTHOLD = 2.0
 
 
-def fuzzy_in(src: str, targets: Set[str]) -> bool:
+def fuzzy_in(src: Optional[str], targets: Set[str]) -> bool:
+    if src is None:
+        return False
     res = [fuzzy(src, target) for target in targets]
     return any(res)
 

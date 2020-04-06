@@ -26,13 +26,13 @@ class Role:
     """
     rolename = "generic"
 
-    greeting = enlarge_keywords({
+    greeting = {
         "hi", "hello", "how", "are", "you", "sup", "what's up"
-    })
+    }
 
-    censorwords = enlarge_keywords({
+    censorwords = {
         "fuck", "shit", "dumb", "ass", "stupid", "retard",
-        })
+        }
 
     negativity = {
         "not", "can't", "cannot", "couldn't", "could not"
@@ -107,7 +107,7 @@ class State(ABC):
     def eval(self, req: Request) -> Response:
         res: str = ""
         parsed = clause(req)
-        wordlist = parsed.val[0] if isinstance(parsed, Right) else None
+        wordlist = set(parsed.val[0]) if isinstance(parsed, Right) else None
         tag = parse_sentence_structure(parsed)
 
         # precheck
@@ -153,20 +153,21 @@ class State(ABC):
             return choice(replies)
         return Response("...")
 
-    def assess(self, wordlist: list) -> 'State.ReqAnalyseVec':
+    def assess(self, wordlist: Set[str]) -> 'State.ReqAnalyseVec':
         negativity = 0
         censor = 0
-        greeting = 0
+        greeting = 1
         n = len(wordlist) - 1 if len(wordlist) > 1 else 1
+        print(wordlist)
         for w in wordlist:
-            if fuzzy_in(w, self.role.censorwords):
+            if w in self.role.censorwords:
                 censor += 1
 
-            if fuzzy_in(w, self.role.negativity):
+            if w in self.role.negativity:
                 negativity += 1
 
             if fuzzy_in(w, self.role.greeting):
-                greeting += 1
+                greeting += 2
 
         return State.ReqAnalyseVec(censor / n, negativity / n, greeting / n)
 
