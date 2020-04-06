@@ -16,7 +16,7 @@ DICTIONARY_PATH = 'static/dictoinary.json'
 
 
 @app.route('/agent/<message>', methods=['GET'])
-#@basic_auth.required
+# @basic_auth.required
 def start_conversation(message):
     state = State(DICTIONARY_PATH)
     state.eat(message.lower())
@@ -24,7 +24,7 @@ def start_conversation(message):
 
 
 @app.route('/agent/<message>', methods=['POST'])
-#@basic_auth.required
+# @basic_auth.required
 def continue_conversation(message):
     history = request.get_json()
     state = State(DICTIONARY_PATH)

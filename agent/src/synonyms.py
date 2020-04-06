@@ -1,6 +1,7 @@
-from nltk.corpus import wordnet
 from itertools import chain
 from typing import Set
+
+from nltk.corpus import wordnet
 
 
 def enlarge_keywords(keywords: Set[str]) -> Set[str]:
@@ -14,6 +15,3 @@ def enlarge_keywords(keywords: Set[str]) -> Set[str]:
             ]))
         enlarged = enlarged.union(s)
     return enlarged
-
-
-

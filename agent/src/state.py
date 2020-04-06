@@ -26,17 +26,17 @@ class Role:
     """
     rolename = "generic"
 
-    greeting = [
+    greeting = enlarge_keywords({
         "hi", "hello", "how", "are", "you", "sup", "what's up"
-    ]
+    })
 
-    censorwords = [
+    censorwords = enlarge_keywords({
         "fuck", "shit", "dumb", "ass", "stupid", "retard",
-    ]
+        })
 
-    negativity = [
+    negativity = {
         "not", "can't", "cannot", "couldn't", "could not"
-    ]
+    }
 
     keywords: Set[str] = set()
 
@@ -159,13 +159,13 @@ class State(ABC):
         greeting = 0
         n = len(wordlist) - 1 if len(wordlist) > 1 else 1
         for w in wordlist:
-            if w in self.role.censorwords:
+            if fuzzy_in(w, self.role.censorwords):
                 censor += 1
 
-            if w in self.role.negativity:
+            if fuzzy_in(w, self.role.negativity):
                 negativity += 1
 
-            if w in self.role.greeting:
+            if fuzzy_in(w, self.role.greeting):
                 greeting += 1
 
         return State.ReqAnalyseVec(censor / n, negativity / n, greeting / n)
